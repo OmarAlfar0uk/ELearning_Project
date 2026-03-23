@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+    <PackageReference Include="MailKit" Version="4.14.1" />
+    <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.23" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.23" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.23" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.23" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.23">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MimeKit" Version="4.14.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\Assignments\CreateAssignment\" />
+    <Folder Include="Features\Assignments\DeleteAssignment\" />
+    <Folder Include="Features\Assignments\CloseAssignment\" />
+    <Folder Include="Features\Assignments\GradeSubmission\" />
+    <Folder Include="Features\Assignments\DTOs\" />
+    <Folder Include="Features\Assignments\SubmitAssignment\" />
+    <Folder Include="Features\Assignments\UpdateAssignment\" />
+    <Folder Include="Features\Batche\CreateBatch\" />
+    <Folder Include="Features\Batche\DeleteBatch\" />
+    <Folder Include="Features\Batche\GetAllBatches\" />
+    <Folder Include="Features\Batche\GetBatchById\" />
+    <Folder Include="Features\Batche\GetStudentsInBatch\" />
+    <Folder Include="Features\Batche\AssignTrackToBatch\" />
+    <Folder Include="Features\Batche\RemoveStudentFromBatch\" />
+    <Folder Include="Features\Batche\UpdateBatch\" />
+    <Folder Include="Features\Lectures\CreateLecture\" />
+    <Folder Include="Features\Lectures\DeleteLecture\" />
+    <Folder Include="Features\Lectures\GetTrackLectures\" />
+    <Folder Include="Features\Lectures\GetLectureDetails\" />
+    <Folder Include="Features\Lectures\DTOs\" />
+    <Folder Include="Features\Lectures\UpdateLecture\" />
+    <Folder Include="Features\Notifications\MarkAsRead\" />
+    <Folder Include="Features\Notifications\MarkAllAsRead\" />
+    <Folder Include="Features\Notifications\GetMyNotifications\" />
+    <Folder Include="Features\Notifications\GetUnreadCount\" />
+    <Folder Include="Features\Notifications\DTOs\" />
+    <Folder Include="Features\Progress\GetMyProgress\" />
+    <Folder Include="Features\Progress\GetStudentProgress\" />
+    <Folder Include="Features\Progress\DTOs\" />
+    <Folder Include="Features\Progress\UpdateProgress\" />
+    <Folder Include="Features\Submissions\GetMySubmission\" />
+    <Folder Include="Features\Submissions\GradeSubmission\" />
+    <Folder Include="Features\Submissions\DTOs\" />
+    <Folder Include="Features\Submissions\SubmitAssignment\" />
+    <Folder Include="Features\Tracks\CreateTrack\" />
+    <Folder Include="Features\Tracks\DeleteTrack\" />
+    <Folder Include="Features\Tracks\GetBatchTracks\" />
+    <Folder Include="Features\Tracks\GetTrackDetails\" />
+    <Folder Include="Features\Tracks\DTOs\" />
+    <Folder Include="Features\Tracks\UpdateTrack\" />
+  </ItemGroup>
+
+</Project>
