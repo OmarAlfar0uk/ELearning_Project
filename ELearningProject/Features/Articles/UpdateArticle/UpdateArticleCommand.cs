@@ -1,5 +1,6 @@
 using ELearningProject.Features.Shared;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace ELearningProject.Features.Articles.UpdateArticle
 {
@@ -7,6 +8,6 @@ namespace ELearningProject.Features.Articles.UpdateArticle
         Guid ArticleId,
         string Title,
         string Content,
-        string? ImageUrl
+        IFormFile? Image
     ) : IRequest<EndpointResponse<string>>;
 }

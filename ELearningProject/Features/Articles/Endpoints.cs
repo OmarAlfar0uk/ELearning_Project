@@ -20,12 +20,18 @@ namespace ELearningProject.Features.Articles
 
             // 1. Create Article – Admin only
             group.MapPost("/", async (
-                [FromBody] CreateArticleCommand command,
+                [FromForm] string title,
+                [FromForm] string content,
+                IFormFile? image,
                 IMediator mediator,
                 ClaimsPrincipal user) =>
             {
                 var authorId = Guid.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var cmd = command with { AuthorId = authorId };
+                var cmd = new CreateArticleCommand(
+                    title,
+                    content,
+                    image,
+                    authorId);
 
                 var response = await mediator.Send(cmd);
 
@@ -33,6 +39,8 @@ namespace ELearningProject.Features.Articles
                     ? Results.Created($"/api/v1/articles/{response.Data}", response)
                     : Results.StatusCode(response.StatusCode);
             })
+            .DisableAntiforgery()
+            .Accepts<CreateArticleRequest>("multipart/form-data")
             .WithName("Create Article")
             .WithSummary("Create a new article (Admin only)")
             .Produces<EndpointResponse<Guid>>(201)
@@ -42,16 +50,24 @@ namespace ELearningProject.Features.Articles
             // 2. Update Article – Admin only
             group.MapPut("/{articleId:guid}", async (
                 Guid articleId,
-                [FromBody] UpdateArticleCommand command,
+                [FromForm] string title,
+                [FromForm] string content,
+                IFormFile? image,
                 IMediator mediator) =>
             {
-                var cmd = command with { ArticleId = articleId };
+                var cmd = new UpdateArticleCommand(
+                    articleId,
+                    title,
+                    content,
+                    image);
                 var response = await mediator.Send(cmd);
 
                 return response.IsSuccess
                     ? Results.Ok(response)
                     : Results.StatusCode(response.StatusCode);
             })
+            .DisableAntiforgery()
+            .Accepts<UpdateArticleRequest>("multipart/form-data")
             .WithName("Update Article")
             .WithSummary("Update an existing article (Admin only)")
             .Produces<EndpointResponse<string>>(200)

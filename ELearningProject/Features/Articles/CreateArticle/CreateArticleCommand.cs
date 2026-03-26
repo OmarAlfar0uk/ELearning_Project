@@ -1,13 +1,13 @@
-using ELearningProject.Features.Articles.DTOs;
 using ELearningProject.Features.Shared;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace ELearningProject.Features.Articles.CreateArticle
 {
     public record CreateArticleCommand(
         string Title,
         string Content,
-        string? ImageUrl,
+        IFormFile? Image,
         Guid AuthorId
     ) : IRequest<EndpointResponse<Guid>>;
 }
