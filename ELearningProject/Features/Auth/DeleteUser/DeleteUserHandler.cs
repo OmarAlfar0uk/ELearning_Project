@@ -1,4 +1,4 @@
-﻿using Auth.Models;
+using Auth.Models;
 using ELearningProject.Features.Admin.DeleteUser;
 using ELearningProject.Features.Shared;
 
@@ -32,8 +32,8 @@ namespace ELearningProject.Features.Auth.DeleteUser
 
            
           
-            user.LockoutEnabled = true;
-            user.LockoutEnd = DateTimeOffset.MaxValue;
+            user.IsDeleted = true;
+            user.UpdatedAt = DateTime.UtcNow;
 
             await _userManager.UpdateAsync(user);
 

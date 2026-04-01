@@ -142,12 +142,12 @@ namespace ELearningProject.Features.Files
 
                 var deleted = await fileService.DeleteFileAsync(fileUrl);
                 return deleted
-                    ? Results.Ok(EndpointResponse<string>.SuccessResponse(null, "File deleted successfully."))
+                    ? Results.NoContent()
                     : Results.BadRequest(EndpointResponse<string>.ErrorResponse("File could not be deleted or was not found.", 400));
             })
             .WithName("Delete File")
             .WithSummary("Delete a file by its URL and remove from DB")
-            .Produces<EndpointResponse<string>>(200)
+            .Produces(204)
             .Produces<EndpointResponse<string>>(400);
         }
     }

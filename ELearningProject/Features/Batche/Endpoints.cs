@@ -1,4 +1,4 @@
-﻿using ELearningProject.Features.Batche.AssignTrackToBatch;
+using ELearningProject.Features.Batche.AssignTrackToBatch;
 using ELearningProject.Features.Batche.CreateBatch;
 using ELearningProject.Features.Batche.DeleteBatch;
 using ELearningProject.Features.Batche.GetAllBatches;
@@ -60,12 +60,12 @@ namespace ELearningProject.Features.Batche
                 var response = await mediator.Send(new DeleteBatchCommand(id));
 
                 return response.IsSuccess
-                    ? Results.Ok(response)
+                    ? Results.NoContent()
                     : Results.BadRequest(response);
             })
             .WithName("Delete Batch")
             .WithSummary("Delete batch by id")
-            .Produces<RequestResponse<string>>(200)
+            .Produces(204)
             .Produces<RequestResponse<string>>(400);
 
             // 🔹 Get By Id

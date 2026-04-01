@@ -1,4 +1,4 @@
-﻿using Auth.Models;
+using Auth.Models;
 using ELearningProject.Features.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +19,9 @@ namespace ELearningProject.Features.Auth.Admin.GetUsers
             GetUsersQuery request,
             CancellationToken cancellationToken)
         {
-            var query = _userManager.Users.AsQueryable();
+            var query = _userManager.Users
+                .Where(u => !u.IsDeleted)
+                .AsQueryable();
 
             // 🔍 Search
             if (!string.IsNullOrWhiteSpace(request.Search))

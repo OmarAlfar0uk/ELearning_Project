@@ -1,4 +1,4 @@
-﻿
+
 using ELearningProject.Features.Assignments.CloseAssignment;
 using ELearningProject.Features.Assignments.CreateAssignment;
 using ELearningProject.Features.Assignments.DeleteAssignment;
@@ -98,12 +98,12 @@ namespace ELearningProject.Features.Assignments
                 var response = await mediator.Send(new DeleteAssignmentCommand(assignmentId));
 
                 return response.IsSuccess
-                    ? Results.Ok(response)
+                    ? Results.NoContent()
                     : Results.BadRequest(response);
             })
             .WithName("Delete Assignment")
             .WithSummary("Delete assignment if no submissions")
-            .Produces<RequestResponse<string>>(200)
+            .Produces(204)
             .Produces<RequestResponse<string>>(400);
 
             // 6. Get Assignment Submissions (Admin/SuperAdmin)

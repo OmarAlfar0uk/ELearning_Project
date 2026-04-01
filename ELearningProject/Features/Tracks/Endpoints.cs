@@ -1,4 +1,4 @@
-﻿
+
 using ELearningProject.Features.Shared;
 using ELearningProject.Features.Tracks.CreateTrack;
 using ELearningProject.Features.Tracks.DeleteTrack;
@@ -100,12 +100,12 @@ namespace ELearningProject.Features.Tracks
                 var response = await mediator.Send(new DeleteTrackCommand(trackId));
 
                 return response.IsSuccess
-                    ? Results.Ok(response)
+                    ? Results.NoContent()
                     : Results.BadRequest(response);
             })
             .WithName("Delete Track")
             .WithSummary("Delete track if no lectures")
-            .Produces<RequestResponse<string>>(200)
+            .Produces(204)
             .Produces<RequestResponse<string>>(400)
             .RequireAuthorization(policy => policy.RequireRole("Admin", "SuperAdmin"));
         }

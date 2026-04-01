@@ -90,18 +90,14 @@ namespace ELearningProject.Services
             var webRootPath = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
             var fullPath = Path.Combine(webRootPath, relativePath);
 
-            // Remove from DB
-            var fileRecord = await _context.UploadedFiles.FirstOrDefaultAsync(f => f.FileUrl == fileUrl);
+            // Soft remove from DB
+            var fileRecord = await _context.UploadedFiles.FirstOrDefaultAsync(f => f.FileUrl == fileUrl && !f.IsDeleted);
             if (fileRecord != null)
             {
-                _context.UploadedFiles.Remove(fileRecord);
+                fileRecord.IsDeleted = true;
+                fileRecord.UpdatedAt = DateTime.UtcNow;
+                _context.UploadedFiles.Update(fileRecord);
                 await _context.SaveChangesAsync();
-            }
-
-            if (File.Exists(fullPath))
-            {
-                File.Delete(fullPath);
-                return true;
             }
 
             return fileRecord != null;
@@ -109,12 +105,16 @@ namespace ELearningProject.Services
 
         public async Task<ELearningProject.Models.UploadedFile?> GetFileByIdAsync(Guid id)
         {
-            return await _context.UploadedFiles.FindAsync(id);
+            var file = await _context.UploadedFiles.FindAsync(id);
+            return file != null && !file.IsDeleted ? file : null;
         }
 
         public async Task<List<ELearningProject.Models.UploadedFile>> GetAllFilesAsync()
         {
-            return await _context.UploadedFiles.OrderByDescending(f => f.CreatedAt).ToListAsync();
+            return await _context.UploadedFiles
+                .Where(f => !f.IsDeleted)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<bool> UpdateFileMetadataAsync(Guid id, string newFileName)

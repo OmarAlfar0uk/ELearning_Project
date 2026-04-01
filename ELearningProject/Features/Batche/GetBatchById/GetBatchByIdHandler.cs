@@ -19,7 +19,7 @@ namespace ELearningProject.Features.Batche.GetBatchById
         {
             var batchRepository = _unitOfWork.GetRepository<Batch>();
 
-            var batch = await batchRepository.FindByCondition(b => b.Id == request.Id)
+            var batch = await batchRepository.FindByCondition(b => b.Id == request.Id && !b.IsDeleted)
                 .Include(b => b.Tracks)
                     .ThenInclude(t => t.Lectures)
                 .Include(b => b.Students.Where(bs => !bs.IsDeleted))

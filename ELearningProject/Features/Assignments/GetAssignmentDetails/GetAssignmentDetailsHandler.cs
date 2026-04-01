@@ -21,7 +21,7 @@ namespace ELearningProject.Features.Assignments.GetAssignmentDetails
         {
             var assignmentRepository = _unitOfWork.GetRepository<Assignment>();
 
-            var assignment = await assignmentRepository.FindByCondition(a => a.Id == request.AssignmentId)
+            var assignment = await assignmentRepository.FindByCondition(a => a.Id == request.AssignmentId && !a.IsDeleted)
                 .Include(a => a.Lecture)
                     .ThenInclude(l => l.Track)
                 .FirstOrDefaultAsync(cancellationToken);

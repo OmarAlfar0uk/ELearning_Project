@@ -29,7 +29,7 @@ namespace ELearningProject.Features.Assignments.GetLectureAssignments
                  return EndpointResponse<List<AssignmentDto>>.NotFoundResponse("Lecture not found.");
             }
 
-            var assignments = await assignmentRepository.FindByCondition(a => a.LectureId == request.LectureId)
+            var assignments = await assignmentRepository.FindByCondition(a => a.LectureId == request.LectureId && !a.IsDeleted)
                 .Select(a => new AssignmentDto(
                     a.Id,
                     a.Title,

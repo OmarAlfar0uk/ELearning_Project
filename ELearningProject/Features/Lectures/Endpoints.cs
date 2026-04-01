@@ -1,4 +1,4 @@
-﻿
+
 using ELearningProject.Features.Lectures.CreateLecture;
 using ELearningProject.Features.Lectures.DeleteLecture;
 using ELearningProject.Features.Lectures.DTOs;
@@ -144,12 +144,12 @@ namespace ELearningProject.Features.Lectures
                 var response = await mediator.Send(new DeleteLectureCommand(lectureId));
 
                 return response.IsSuccess
-                    ? Results.Ok(response)
+                    ? Results.NoContent()
                     : Results.BadRequest(response);
             })
             .WithName("Delete Lecture")
             .WithSummary("Delete lecture if no assignments")
-            .Produces<RequestResponse<string>>(200)
+            .Produces(204)
             .Produces<RequestResponse<string>>(400);
         }
     }

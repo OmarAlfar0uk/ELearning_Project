@@ -24,7 +24,10 @@ namespace ELearningProject.Features.Batche.DeleteBatch
                 return RequestResponse<string>.Fail("Batch not found.");
             }
 
-            batchRepository.Delete(batch);
+            batch.IsDeleted = true;
+            batch.UpdatedAt = DateTime.UtcNow;
+            
+            batchRepository.Update(batch);
             await _unitOfWork.SaveChangesAsync();
 
             return RequestResponse<string>.Success(null, "Batch deleted successfully.");

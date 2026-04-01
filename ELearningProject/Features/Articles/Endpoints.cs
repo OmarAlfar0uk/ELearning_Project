@@ -82,12 +82,12 @@ namespace ELearningProject.Features.Articles
                 var response = await mediator.Send(new DeleteArticleCommand(articleId));
 
                 return response.IsSuccess
-                    ? Results.Ok(response)
+                    ? Results.NoContent()
                     : Results.StatusCode(response.StatusCode);
             })
             .WithName("Delete Article")
             .WithSummary("Soft-delete an article (Admin only)")
-            .Produces<EndpointResponse<string>>(200)
+            .Produces(204)
             .Produces<EndpointResponse<string>>(404)
             .RequireAuthorization(policy => policy.RequireRole("Admin", "SuperAdmin"));
 

@@ -31,8 +31,8 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
             var totalAdminsCount = (await _userManager.GetUsersInRoleAsync("Admin")).Count;
             var totalSuperAdminsCount = (await _userManager.GetUsersInRoleAsync("SuperAdmin")).Count;
             var totalAdmins = totalAdminsCount + totalSuperAdminsCount;
-            var totalTracks = await trackRepo.GetAll().CountAsync(cancellationToken);
-            var totalBatches = await batchRepo.GetAll().CountAsync(cancellationToken);
+            var totalTracks = await trackRepo.FindByCondition(t => !t.IsDeleted).CountAsync(cancellationToken);
+            var totalBatches = await batchRepo.FindByCondition(b => !b.IsDeleted).CountAsync(cancellationToken);
 
             // 2. Recent Users
             var recentUsers = await userRepo.GetAll()
@@ -45,7 +45,7 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
             var submissionRepoForTracks = _unitOfWork.GetRepository<Submission>();
             var batchStudentRepo = _unitOfWork.GetRepository<BatchStudent>();
 
-            var topTracks = await trackRepo.GetAll()
+            var topTracks = await trackRepo.FindByCondition(t => !t.IsDeleted)
                 .Select(t => new
                 {
                     t.Name,

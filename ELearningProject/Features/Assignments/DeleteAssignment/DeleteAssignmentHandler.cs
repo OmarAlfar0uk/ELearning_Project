@@ -34,7 +34,10 @@ namespace ELearningProject.Features.Assignments.DeleteAssignment
                 return RequestResponse<string>.Fail("Cannot delete assignment because it has submissions.");
             }
 
-            assignmentRepository.Delete(assignment);
+            assignment.IsDeleted = true;
+            assignment.UpdatedAt = DateTime.UtcNow;
+            
+            assignmentRepository.Update(assignment);
             await _unitOfWork.SaveChangesAsync();
 
             return RequestResponse<string>.Success(null, "Assignment deleted successfully.");

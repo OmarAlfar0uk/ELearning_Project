@@ -1,5 +1,4 @@
-﻿
-using Auth.Behaviors;
+﻿using Auth.Behaviors;
 using Auth.Contarcts;
 using Auth.Data.Seeding;
 using Auth.Models;
@@ -21,7 +20,6 @@ using ELearningProject.Features.Submissions;
 using ELearningProject.Features.Files;
 using ELearningProject.Features.Dashboard;
 using ELearningProject.Features.Articles;
-
 using ELearningProject.Repositories;
 using ELearningProject.Seeding;
 using ELearningProject.Services;
@@ -38,9 +36,9 @@ namespace ELearningProject
 {
     public class Program
     {
-  
         public static async Task Main(string[] args)
         {
+
             #region Serilog
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
@@ -61,7 +59,6 @@ namespace ELearningProject
             #endregion
 
             var builder = WebApplication.CreateBuilder(args);
-
 
             #region --- Services ---
             builder.Services.AddControllers();
@@ -213,6 +210,7 @@ namespace ELearningProject
             #endregion
 
             #endregion
+
             var app = builder.Build();
 
             #region --- Migration & Seeding ---
@@ -286,8 +284,8 @@ namespace ELearningProject
 
             #endregion
 
-
             app.Run();
         }
+
     }
 }
