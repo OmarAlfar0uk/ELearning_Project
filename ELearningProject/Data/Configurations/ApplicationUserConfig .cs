@@ -1,4 +1,4 @@
-﻿using Auth.Models;
+using Auth.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -27,6 +27,8 @@ namespace ELearningProject.Data.Configurations
                    .IsRequired();
 
             builder.Property(u => u.LastLoginAt);
+            builder.Property(u => u.IsDeleted)
+                   .IsRequired();
 
             builder.Property(u => u.DateOfBirth);
 

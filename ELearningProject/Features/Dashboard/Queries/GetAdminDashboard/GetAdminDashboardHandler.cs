@@ -28,16 +28,17 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
             // 1. Basic Counts
             // Note: Using IQueryable to ensure global filters (IsDeleted) are applied and to avoid fetching all users
             var totalStudents = await _userManager.GetUsersInRoleAsync("Student");
-            var filteredStudentsCount = totalStudents.Count; // Identity method might not filter correctly if global filter is new
+            var filteredStudentsCount = totalStudents.Count(u => !u.IsDeleted);
 
-            var totalAdminsCount = (await _userManager.GetUsersInRoleAsync("Admin")).Count;
-            var totalSuperAdminsCount = (await _userManager.GetUsersInRoleAsync("SuperAdmin")).Count;
-            var totalAdmins = totalAdminsCount + totalSuperAdminsCount;
+            var admins = await _userManager.GetUsersInRoleAsync("Admin");
+            var superAdmins = await _userManager.GetUsersInRoleAsync("SuperAdmin");
+            var totalAdmins = admins.Count(u => !u.IsDeleted) + superAdmins.Count(u => !u.IsDeleted);
             var totalTracks = await trackRepo.GetAll().CountAsync(cancellationToken);
             var totalBatches = await batchRepo.GetAll().CountAsync(cancellationToken);
 
             // 2. Recent Users
-            var recentUsers = await userRepo.GetAll()
+            var recentUsers = await _unitOfWork.GetRepository<ApplicationUser>().GetAll()
+                .Where(u => !u.IsDeleted) // Force filter again
                 .OrderByDescending(u => u.CreatedAt)
                 .Take(5)
                 .Select(u => new RecentUserDto(u.FullName, u.Email!, "User", u.CreatedAt))
@@ -61,7 +62,7 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
             foreach (var t in topTracks)
             {
                 var avgScore = await submissionRepoForTracks
-                    .FindByCondition(s => s.Assignment.Lecture.TrackId == t.Id && s.Score.HasValue)
+                    .FindByCondition(s => s.Assignment.Lecture.TrackId == t.Id && s.Score.HasValue && !s.Student.IsDeleted)
                     .AverageAsync(s => (double?)s.Score, cancellationToken) ?? 0;
 
                 var studentCount = await batchStudentRepo
@@ -76,8 +77,8 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
             // 4. Top Students
             var submissionRepo = _unitOfWork.GetRepository<Submission>();
 
-            // Step 1: Get top 5 students by average score from DB (no navigation props in GroupBy)
-            var topStudentScores = await submissionRepo.FindByCondition(s => s.Score.HasValue)
+            // Step 1: Get top 5 students by average score from DB (ensure student is not deleted)
+            var topStudentScores = await submissionRepo.FindByCondition(s => s.Score.HasValue && !s.Student.IsDeleted)
                 .GroupBy(s => s.StudentId)
                 .Select(g => new
                 {
@@ -88,9 +89,10 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
                 .Take(5)
                 .ToListAsync(cancellationToken);
 
-            // Step 2: Load student info in-memory
+            // Step 2: Load student info in-memory (ensure not deleted again)
             var studentIds = topStudentScores.Select(x => x.StudentId).ToList();
-            var studentInfos = await userRepo.FindByCondition(u => studentIds.Contains(u.Id))
+            var studentInfos = await _unitOfWork.GetRepository<ApplicationUser>().GetAll()
+                .Where(u => studentIds.Contains(u.Id) && !u.IsDeleted)
                 .Select(u => new { u.Id, u.FullName, u.Email })
                 .ToListAsync(cancellationToken);
 
