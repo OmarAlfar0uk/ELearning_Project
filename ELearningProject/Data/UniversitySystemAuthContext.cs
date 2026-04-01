@@ -1,4 +1,4 @@
-﻿using Auth.Models;
+using Auth.Models;
 using ELearningProject.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -72,6 +72,7 @@ namespace ELearningProject.Data
             modelBuilder.Entity<Article>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<InstructorTrack>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<UploadedFile>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<ApplicationUser>().HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }

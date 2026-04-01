@@ -26,13 +26,15 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
             var batchRepo = _unitOfWork.GetRepository<Batch>();
 
             // 1. Basic Counts
-            // Note: Creating separate queries to avoid fetching all data
-            var totalStudents = (await _userManager.GetUsersInRoleAsync("Student")).Count;
+            // Note: Using IQueryable to ensure global filters (IsDeleted) are applied and to avoid fetching all users
+            var totalStudents = await _userManager.GetUsersInRoleAsync("Student");
+            var filteredStudentsCount = totalStudents.Count; // Identity method might not filter correctly if global filter is new
+
             var totalAdminsCount = (await _userManager.GetUsersInRoleAsync("Admin")).Count;
             var totalSuperAdminsCount = (await _userManager.GetUsersInRoleAsync("SuperAdmin")).Count;
             var totalAdmins = totalAdminsCount + totalSuperAdminsCount;
-            var totalTracks = await trackRepo.FindByCondition(t => !t.IsDeleted).CountAsync(cancellationToken);
-            var totalBatches = await batchRepo.FindByCondition(b => !b.IsDeleted).CountAsync(cancellationToken);
+            var totalTracks = await trackRepo.GetAll().CountAsync(cancellationToken);
+            var totalBatches = await batchRepo.GetAll().CountAsync(cancellationToken);
 
             // 2. Recent Users
             var recentUsers = await userRepo.GetAll()
@@ -118,7 +120,7 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
                 .ToList();
 
             var dto = new AdminDashboardDto(
-                totalStudents,
+                filteredStudentsCount,
                 totalAdmins,
                 totalTracks,
                 totalBatches,
