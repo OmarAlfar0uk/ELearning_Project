@@ -1,7 +1,6 @@
 using Auth.Models;
 using ELearningProject.Features.Admin.DeleteUser;
 using ELearningProject.Features.Shared;
-
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -21,8 +20,8 @@ namespace ELearningProject.Features.Auth.DeleteUser
             DeleteUserCommand request,
             CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user == null)
+            var user = await _userManager.FindByIdAsync(request.UserId.ToString());
+            if (user == null || user.IsDeleted)
                 return RequestResponse<bool>.Fail("User not found");
 
             // ❌ ممنوع حذف SuperAdmin
@@ -30,8 +29,6 @@ namespace ELearningProject.Features.Auth.DeleteUser
             if (roles.Contains("SuperAdmin"))
                 return RequestResponse<bool>.Fail("Cannot delete SuperAdmin");
 
-           
-          
             user.IsDeleted = true;
             user.UpdatedAt = DateTime.UtcNow;
 

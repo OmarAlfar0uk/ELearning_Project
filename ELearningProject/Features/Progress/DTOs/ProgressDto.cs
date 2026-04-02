@@ -6,6 +6,8 @@ namespace ELearningProject.Features.Progress.DTOs
         Guid TrackId,
         int CompletionPercentage,
         int Rank,
-        double AverageScore
+        double AverageScore,
+        string StudentName = "",
+        string StudentEmail = ""
     );
 }

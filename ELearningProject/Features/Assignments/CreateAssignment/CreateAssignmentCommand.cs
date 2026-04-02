@@ -1,6 +1,7 @@
 
 using ELearningProject.Features.Shared;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace ELearningProject.Features.Assignments.CreateAssignment
 {
@@ -8,6 +9,7 @@ namespace ELearningProject.Features.Assignments.CreateAssignment
         Guid LectureId,
         string Title,
         int MaxScore,
-        DateTime? DueDate
+        DateTime? DueDate,
+        IFormFile? File = null
     ) : IRequest<EndpointResponse<Guid>>;
 }

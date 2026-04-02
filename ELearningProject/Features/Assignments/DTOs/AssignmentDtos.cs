@@ -9,7 +9,8 @@ namespace ELearningProject.Features.Assignments.DTOs
         string Title,
         int MaxScore,
         DateTime? DueDate,
-        bool IsClosed
+        bool IsClosed,
+        string? FileUrl = null
     );
 
     public record AssignmentDetailsDto(
@@ -21,7 +22,8 @@ namespace ELearningProject.Features.Assignments.DTOs
         Guid LectureId,
         string LectureTitle,
         Guid TrackId,
-        string TrackName
+        string TrackName,
+        string? FileUrl = null
     );
 
     public record AssignmentStatsDto(

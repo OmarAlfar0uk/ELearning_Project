@@ -1,10 +1,11 @@
-﻿using ELearningProject.Contracts;
+using ELearningProject.Contracts;
 using ELearningProject.Features.Auth.Activate;
 using ELearningProject.Features.Auth.Admin.ChangeRole;
 using ELearningProject.Features.Auth.Admin.Create;
 using ELearningProject.Features.Auth.Admin.CreateStudent;
 using ELearningProject.Features.Auth.Admin.GetUsers;
 using ELearningProject.Features.Auth.Admin.ToggleUserStatus;
+using ELearningProject.Features.Admin.DeleteUser;
 using ELearningProject.Features.Auth.ChangePassword;
 using ELearningProject.Features.Auth.ForgetPassword.OTP;
 using ELearningProject.Features.Auth.ForgetPassword.ResetPassword;
@@ -49,6 +50,11 @@ namespace ELearningProject.Features.Auth
                  .WithTags("Admin – Students")
                 .RequireAuthorization(policy =>
                     policy.RequireRole("Admin", "SuperAdmin"));
+
+            group.MapDelete("/admin/users/{userId:guid}", DeleteUser)
+                 .WithName("Delete User")
+                 .WithSummary("Soft-delete a user by ID (Admin/SuperAdmin)")
+                 .RequireAuthorization(policy => policy.RequireRole("Admin", "SuperAdmin"));
 
             group.MapGet("/me", GetCurrentUser)
                  .RequireAuthorization();
@@ -248,6 +254,18 @@ namespace ELearningProject.Features.Auth
                 success = result,
                 message = "Password reset successfully."
             });
+        }
+
+        private static async Task<IResult> DeleteUser(
+            Guid userId,
+            IMediator mediator)
+        {
+            var result = await mediator.Send(new DeleteUserCommand(userId));
+
+            if (!result.IsSuccess)
+                return Results.BadRequest(new { message = result.Message });
+
+            return Results.NoContent();
         }
 
     }

@@ -35,7 +35,8 @@ namespace ELearningProject.Features.Assignments.GetLectureAssignments
                     a.Title,
                     a.MaxScore,
                     a.DueDate,
-                    a.IsClosed
+                    a.IsClosed,
+                    a.FileUrl
                 ))
                 .ToListAsync(cancellationToken);
 

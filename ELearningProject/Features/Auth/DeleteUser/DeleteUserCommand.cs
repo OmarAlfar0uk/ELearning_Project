@@ -1,8 +1,8 @@
-﻿using MediatR;
+using MediatR;
 using ELearningProject.Features.Shared;
 
 namespace ELearningProject.Features.Admin.DeleteUser
 {
-    public record DeleteUserCommand(string Email)
+    public record DeleteUserCommand(Guid UserId)
         : IRequest<RequestResponse<bool>>;
 }

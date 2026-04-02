@@ -23,25 +23,45 @@ namespace ELearningProject.Features.Assignments
 
             // 1. Create Assignment
             group.MapPost("/lectures/{lectureId:guid}/assignments", async (
-                Guid lectureId, 
-                [FromBody] CreateAssignmentCommand command, 
+                Guid lectureId,
+                HttpContext httpContext,
                 IMediator mediator) =>
             {
-                if (command.LectureId != lectureId)
+                if (!httpContext.Request.HasFormContentType)
+                    return Results.BadRequest(EndpointResponse<Guid>.ErrorResponse("Request must be multipart/form-data.", 400));
+
+                var form = httpContext.Request.Form;
+
+                if (!form.TryGetValue("title", out var titleValues) || string.IsNullOrWhiteSpace(titleValues))
+                    return Results.BadRequest(EndpointResponse<Guid>.ErrorResponse("Title is required.", 400));
+
+                if (!form.TryGetValue("maxScore", out var maxScoreValues) || !int.TryParse(maxScoreValues, out var maxScore))
+                    return Results.BadRequest(EndpointResponse<Guid>.ErrorResponse("MaxScore is required and must be a number.", 400));
+
+                DateTime? dueDate = null;
+                if (form.TryGetValue("dueDate", out var dueDateValues) && !string.IsNullOrWhiteSpace(dueDateValues))
                 {
-                    command = command with { LectureId = lectureId };
+                    if (DateTime.TryParse(dueDateValues, out var parsedDate))
+                        dueDate = parsedDate.ToUniversalTime();
                 }
 
+                var file = form.Files.GetFile("file");
+
+                var command = new CreateAssignmentCommand(lectureId, titleValues!, maxScore, dueDate, file);
                 var response = await mediator.Send(command);
 
                 return response.IsSuccess
                     ? Results.Created($"/api/v1/assignments/{response.Data}", response)
-                    : Results.StatusCode(response.StatusCode);
+                    : Results.Json(response, statusCode: response.StatusCode);
             })
+            .DisableAntiforgery()
+            .Accepts<CreateAssignmentRequest>("multipart/form-data")
             .WithName("Create Assignment")
-            .WithSummary("Create new assignment for a lecture")
+            .WithSummary("Create new assignment for a lecture (supports optional file attachment)")
             .Produces<EndpointResponse<Guid>>(201)
-            .Produces<EndpointResponse<Guid>>(404);
+            .Produces<EndpointResponse<Guid>>(400)
+            .Produces<EndpointResponse<Guid>>(404)
+            .RequireAuthorization(policy => policy.RequireRole("Admin", "SuperAdmin"));
 
             // 2. Get Lecture Assignments
             group.MapGet("/lectures/{lectureId:guid}/assignments", async (Guid lectureId, IMediator mediator) =>

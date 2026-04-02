@@ -1,3 +1,4 @@
+using Auth.Models;
 using ELearningProject.Contarcts;
 using ELearningProject.Features.Progress.DTOs;
 using ELearningProject.Features.Shared;
@@ -23,11 +24,17 @@ namespace ELearningProject.Features.Progress.GetMyProgress
             var submissionRepository = _unitOfWork.GetRepository<Submission>();
             var batchStudentRepo     = _unitOfWork.GetRepository<BatchStudent>();
             var progressRepo         = _unitOfWork.GetRepository<ELearningProject.Models.Progress>();
+            var userRepository       = _unitOfWork.GetRepository<ApplicationUser>();
 
             // 1. Validate track
             var track = await trackRepository.GetByIdAsync(request.TrackId);
             if (track == null)
                 return EndpointResponse<ProgressDto>.NotFoundResponse("Track not found.");
+
+            // 1.5 Get User details
+            var user = await userRepository.GetByIdAsync(request.StudentId);
+            string studentName = user != null ? $"{user.FirstName} {user.LastName}" : string.Empty;
+            string studentEmail = user?.Email ?? string.Empty;
 
             // 2. Check student is in batch (skip for Admins)
             bool isAdmin = request.UserRole == "Admin" || request.UserRole == "SuperAdmin";
@@ -120,7 +127,9 @@ namespace ELearningProject.Features.Progress.GetMyProgress
                 request.TrackId,
                 completionPercentage,
                 rank,
-                averageScore
+                averageScore,
+                studentName,
+                studentEmail
             ));
         }
     }

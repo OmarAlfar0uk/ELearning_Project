@@ -40,7 +40,8 @@ namespace ELearningProject.Features.Assignments.GetAssignmentDetails
                 assignment.LectureId,
                 assignment.Lecture.Title, // Assuming Lecture has Title
                 assignment.Lecture.TrackId,
-                assignment.Lecture.Track.Name // Assuming Track has Name
+                assignment.Lecture.Track.Name, // Assuming Track has Name
+                assignment.FileUrl
             );
 
             return EndpointResponse<AssignmentDetailsDto>.SuccessResponse(dto);
