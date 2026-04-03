@@ -1,6 +1,7 @@
 
 using ELearningProject.Features.Shared;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace ELearningProject.Features.Assignments.UpdateAssignment
 {
@@ -8,6 +9,7 @@ namespace ELearningProject.Features.Assignments.UpdateAssignment
         Guid AssignmentId,
         string Title,
         int MaxScore,
-        DateTime? DueDate
+        DateTime? DueDate,
+        IFormFile? File = null
     ) : IRequest<RequestResponse<string>>;
 }

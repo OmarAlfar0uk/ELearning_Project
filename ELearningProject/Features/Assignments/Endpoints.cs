@@ -92,14 +92,31 @@ namespace ELearningProject.Features.Assignments
 
             // 4. Update Assignment
             group.MapPut("/assignments/{assignmentId:guid}", async (
-                Guid assignmentId, 
-                [FromBody] UpdateAssignmentCommand command, 
+                Guid assignmentId,
+                HttpContext httpContext,
                 IMediator mediator) =>
             {
-                if (command.AssignmentId != assignmentId)
+                if (!httpContext.Request.HasFormContentType)
+                    return Results.BadRequest(EndpointResponse<string>.ErrorResponse("Request must be multipart/form-data.", 400));
+
+                var form = httpContext.Request.Form;
+
+                if (!form.TryGetValue("title", out var titleValues) || string.IsNullOrWhiteSpace(titleValues))
+                    return Results.BadRequest(EndpointResponse<string>.ErrorResponse("Title is required.", 400));
+
+                if (!form.TryGetValue("maxScore", out var maxScoreValues) || !int.TryParse(maxScoreValues, out var maxScore))
+                    return Results.BadRequest(EndpointResponse<string>.ErrorResponse("MaxScore is required and must be a number.", 400));
+
+                DateTime? dueDate = null;
+                if (form.TryGetValue("dueDate", out var dueDateValues) && !string.IsNullOrWhiteSpace(dueDateValues))
                 {
-                    command = command with { AssignmentId = assignmentId };
+                    if (DateTime.TryParse(dueDateValues, out var parsedDate))
+                        dueDate = parsedDate.ToUniversalTime();
                 }
+
+                var file = form.Files.GetFile("file");
+
+                var command = new UpdateAssignmentCommand(assignmentId, titleValues!, maxScore, dueDate, file);
 
                 var response = await mediator.Send(command);
 
@@ -107,6 +124,8 @@ namespace ELearningProject.Features.Assignments
                     ? Results.Ok(response)
                     : Results.BadRequest(response);
             })
+            .DisableAntiforgery()
+            .Accepts<UpdateAssignmentRequest>("multipart/form-data")
             .WithName("Update Assignment")
             .WithSummary("Update assignment details")
             .Produces<RequestResponse<string>>(200)
