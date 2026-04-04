@@ -21,7 +21,6 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
 
         public async Task<EndpointResponse<AdminDashboardDto>> Handle(GetAdminDashboardQuery request, CancellationToken cancellationToken)
         {
-            var userRepo = _unitOfWork.GetRepository<ApplicationUser>();
             var trackRepo = _unitOfWork.GetRepository<Track>();
             var batchRepo = _unitOfWork.GetRepository<Batch>();
 
@@ -37,12 +36,24 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
             var totalBatches = await batchRepo.GetAll().CountAsync(cancellationToken);
 
             // 2. Recent Users
-            var recentUsers = await _unitOfWork.GetRepository<ApplicationUser>().GetAll()
+            var recentUserEntities = await _unitOfWork.GetRepository<ApplicationUser>().GetAll()
                 .Where(u => !u.IsDeleted) // Force filter again
                 .OrderByDescending(u => u.CreatedAt)
                 .Take(5)
-                .Select(u => new RecentUserDto(u.FullName, u.Email!, "User", u.CreatedAt))
                 .ToListAsync(cancellationToken);
+
+            var recentUsers = new List<RecentUserDto>(recentUserEntities.Count);
+
+            foreach (var user in recentUserEntities)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                recentUsers.Add(new RecentUserDto(
+                    user.FullName,
+                    user.Email!,
+                    ResolveDashboardRole(roles),
+                    user.CreatedAt));
+            }
 
             // 3. Top Tracks (real avg score per track)
             var submissionRepoForTracks = _unitOfWork.GetRepository<Submission>();
@@ -132,6 +143,26 @@ namespace ELearningProject.Features.Dashboard.Queries.GetAdminDashboard
             );
 
             return EndpointResponse<AdminDashboardDto>.SuccessResponse(dto);
+        }
+
+        private static string ResolveDashboardRole(IList<string> roles)
+        {
+            if (roles.Contains("SuperAdmin"))
+            {
+                return "SuperAdmin";
+            }
+
+            if (roles.Contains("Admin"))
+            {
+                return "Admin";
+            }
+
+            if (roles.Contains("Student"))
+            {
+                return "Student";
+            }
+
+            return "Unassigned";
         }
     }
 }

@@ -1,4 +1,5 @@
 using ELearningProject.Contracts;
+using ELearningProject.Features.Auth.Admin.GetAdmins;
 using ELearningProject.Features.Auth.Activate;
 using ELearningProject.Features.Auth.Admin.ChangeRole;
 using ELearningProject.Features.Auth.Admin.Create;
@@ -42,6 +43,8 @@ namespace ELearningProject.Features.Auth
                  .RequireAuthorization(policy => policy.RequireRole("SuperAdmin"));
             group.MapPut("/admin/change-role", ChangeUserRole)
                  .RequireAuthorization(policy => policy.RequireRole("SuperAdmin"));
+            group.MapGet("/admin/admins", GetAdmins)
+                 .RequireAuthorization(policy => policy.RequireRole("Admin", "SuperAdmin"));
             group.MapGet("/admin/users", GetUsers)
                  .RequireAuthorization(policy => policy.RequireRole("Admin", "SuperAdmin"));
             group.MapPut("/admin/users/{userId:guid}/toggle-status", ToggleUserStatus)
@@ -132,6 +135,14 @@ namespace ELearningProject.Features.Auth
 
         private static async Task<IResult> GetUsers(
         [AsParameters] GetUsersQuery query,
+        IMediator mediator)
+        {
+            var result = await mediator.Send(query);
+            return result.ToHttpResult();
+        }
+
+        private static async Task<IResult> GetAdmins(
+        [AsParameters] GetAdminsQuery query,
         IMediator mediator)
         {
             var result = await mediator.Send(query);
