@@ -35,8 +35,12 @@ namespace ELearningProject.Features.Auth.Admin.CreateStudent
             CreateStudentCommand request,
             CancellationToken cancellationToken)
         {
-            // 1️⃣ Check email uniqueness
-            if (await _userManager.FindByEmailAsync(request.Email) != null)
+            // 1️⃣ Check email/username uniqueness, including soft-deleted users.
+            if (await IdentityUserConflictHelper.ExistsByEmailOrUsernameIncludingDeletedAsync(
+                    _context,
+                    _userManager,
+                    request.Email,
+                    cancellationToken))
             {
                 return EndpointResponse<CreateStudentResponse>
                     .ErrorResponse("Email already exists", 409);
@@ -182,6 +186,17 @@ namespace ELearningProject.Features.Auth.Admin.CreateStudent
                     },
                     "Student created and added to batch successfully",
                     201
+                );
+            }
+            catch (DbUpdateException ex) when (IdentityUserConflictHelper.IsDuplicateUserNameConflict(ex))
+            {
+                await transaction.RollbackAsync(cancellationToken);
+
+                Log.Warning(ex, "CreateStudent conflict for {Email}", request.Email);
+
+                return EndpointResponse<CreateStudentResponse>.ErrorResponse(
+                    "Email already exists",
+                    409
                 );
             }
             catch (Exception ex)

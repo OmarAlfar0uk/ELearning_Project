@@ -56,7 +56,7 @@ namespace ELearningProject.Features.Auth
 
             group.MapDelete("/admin/users/{userId:guid}", DeleteUser)
                  .WithName("Delete User")
-                 .WithSummary("Soft-delete a user by ID (Admin/SuperAdmin)")
+                 .WithSummary("Hard-delete a user by ID (Admin/SuperAdmin)")
                  .RequireAuthorization(policy => policy.RequireRole("Admin", "SuperAdmin"));
 
             group.MapGet("/me", GetCurrentUser)
