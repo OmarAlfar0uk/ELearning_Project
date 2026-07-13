@@ -64,7 +64,8 @@ namespace ELearningProject.Features.Lectures
             .WithSummary("Create new lecture in a track (supports file upload)")
             .Produces<EndpointResponse<Guid>>(201)
             .Produces<EndpointResponse<Guid>>(404)
-            .Produces<EndpointResponse<Guid>>(409);
+            .Produces<EndpointResponse<Guid>>(409)
+            .RequireAuthorization("TrackOwnership");
 
             // 2. Get Track Lectures
             group.MapGet("/tracks/{trackId:guid}/lectures", async (Guid trackId, IMediator mediator) =>
@@ -77,7 +78,8 @@ namespace ELearningProject.Features.Lectures
             })
             .WithName("Get Track Lectures")
             .WithSummary("Get all lectures for a track")
-            .Produces<EndpointResponse<List<LectureDto>>>(200);
+            .Produces<EndpointResponse<List<LectureDto>>>(200)
+            .RequireAuthorization("TrackOwnership");
 
             // 3. Get Lecture Details
             group.MapGet("/lectures/{lectureId:guid}", async (Guid lectureId, IMediator mediator) =>
@@ -91,7 +93,8 @@ namespace ELearningProject.Features.Lectures
             .WithName("Get Lecture Details")
             .WithSummary("Get detailed info about a lecture")
             .Produces<EndpointResponse<LectureDetailsDto>>(200)
-            .Produces<EndpointResponse<LectureDetailsDto>>(404);
+            .Produces<EndpointResponse<LectureDetailsDto>>(404)
+            .RequireAuthorization("TrackOwnership");
 
             // 4. Update Lecture
             // 4. Update Lecture
@@ -136,7 +139,8 @@ namespace ELearningProject.Features.Lectures
             .WithName("Update Lecture")
             .WithSummary("Update lecture details")
             .Produces<RequestResponse<string>>(200)
-            .Produces<RequestResponse<string>>(400);
+            .Produces<RequestResponse<string>>(400)
+            .RequireAuthorization("TrackOwnership");
 
             // 5. Delete Lecture
             group.MapDelete("/lectures/{lectureId:guid}", async (Guid lectureId, IMediator mediator) =>
@@ -150,7 +154,8 @@ namespace ELearningProject.Features.Lectures
             .WithName("Delete Lecture")
             .WithSummary("Delete lecture if no assignments")
             .Produces(204)
-            .Produces<RequestResponse<string>>(400);
+            .Produces<RequestResponse<string>>(400)
+            .RequireAuthorization("TrackOwnership");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Auth.Models;
+using Auth.Models;
 using Serilog.Parsing;
 
 namespace ELearningProject.Models
@@ -13,5 +13,6 @@ namespace ELearningProject.Models
         public Guid TrackId { get; set; }
         public Track Track { get; set; } = default!;
         public ICollection<Assignment> Assignments { get; set; } = new HashSet<Assignment>();
+        public ICollection<Material> Materials { get; set; } = new HashSet<Material>();
     }
 }

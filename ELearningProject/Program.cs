@@ -1,4 +1,4 @@
-﻿using Auth.Behaviors;
+using Auth.Behaviors;
 using Auth.Contarcts;
 using Auth.Data.Seeding;
 using Auth.Models;
@@ -12,6 +12,7 @@ using ELearningProject.Features.Auth;
 using ELearningProject.Features.Progress;
 using ELearningProject.Features.Tracks;
 using ELearningProject.Features.Lectures;
+using ELearningProject.Features.Materials;
 using ELearningProject.Features.Notifications;
 using ELearningProject.Features.Auth.UpdateUserProfile;
 using ELearningProject.Features.Batche;
@@ -160,7 +161,15 @@ namespace ELearningProject
             });
 
             builder.Services.AddSignalR();
-            builder.Services.AddAuthorization();
+            builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, TrackOwnershipHandler>();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("TrackOwnership", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.Requirements.Add(new TrackOwnershipRequirement());
+                });
+            });
             builder.Services.AddAntiforgery();
             #endregion
 
@@ -275,6 +284,7 @@ namespace ELearningProject
             app.MapProgressEndpoints();
             app.MapTrackEndpoints();
             app.MapLectureEndpoints();
+            app.MapMaterialEndpoints();
             app.MapNotificationEndpoints();
             app.MapFileEndpoints();
             app.MapDashboardEndpoints();

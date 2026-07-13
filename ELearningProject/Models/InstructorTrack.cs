@@ -10,5 +10,8 @@ namespace ELearningProject.Models
 
         public Guid TrackId { get; set; }
         public Track Track { get; set; } = default!;
+
+        public Guid? AssignedByAdminId { get; set; }
+        public ApplicationUser? AssignedByAdmin { get; set; }
     }
 }

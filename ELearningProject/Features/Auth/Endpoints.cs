@@ -4,6 +4,7 @@ using ELearningProject.Features.Auth.Activate;
 using ELearningProject.Features.Auth.Admin.ChangeRole;
 using ELearningProject.Features.Auth.Admin.Create;
 using ELearningProject.Features.Auth.Admin.CreateStudent;
+using ELearningProject.Features.Auth.Admin.CreateTeacher;
 using ELearningProject.Features.Auth.Admin.GetUsers;
 using ELearningProject.Features.Auth.Admin.ToggleUserStatus;
 using ELearningProject.Features.Admin.DeleteUser;
@@ -38,7 +39,6 @@ namespace ELearningProject.Features.Auth
             group.MapPost("/refresh", Refresh);
             group.MapPost("/logout", Logout);
             
-            
             group.MapPost("/admin/create", CreateAdmin)
                  .RequireAuthorization(policy => policy.RequireRole("SuperAdmin"));
             group.MapPut("/admin/change-role", ChangeUserRole)
@@ -51,8 +51,10 @@ namespace ELearningProject.Features.Auth
                   .RequireAuthorization(policy => policy.RequireRole("Admin", "SuperAdmin"));
             group.MapPost("/admin/students", CreateStudent)
                  .WithTags("Admin – Students")
-                .RequireAuthorization(policy =>
-                    policy.RequireRole("Admin", "SuperAdmin"));
+                 .RequireAuthorization(policy => policy.RequireRole("Admin", "SuperAdmin"));
+            group.MapPost("/admin/teachers", CreateTeacher)
+                 .WithTags("Admin – Teachers")
+                 .RequireAuthorization(policy => policy.RequireRole("Admin", "SuperAdmin"));
 
             group.MapDelete("/admin/users/{userId:guid}", DeleteUser)
                  .WithName("Delete User")
@@ -70,11 +72,8 @@ namespace ELearningProject.Features.Auth
                  .RequireAuthorization();
 
             group.MapPost("/forget-password", ForgetPassword);
-
             group.MapPost("/verify-otp", VerifyOtp);
-
             group.MapPost("/reset-password", ResetPassword);
-
 
             return app;
         }
@@ -109,13 +108,10 @@ namespace ELearningProject.Features.Auth
         private static async Task<IResult> Logout(
         LogoutCommand command,
         IMediator mediator)
-            {
-                var result = await mediator.Send(command);
-                return result.ToHttpResult();
-            }
-
-       
-
+        {
+            var result = await mediator.Send(command);
+            return result.ToHttpResult();
+        }
 
         private static async Task<IResult> CreateAdmin(
         CreateAdminCommand command,
@@ -172,11 +168,17 @@ namespace ELearningProject.Features.Auth
             return result.ToHttpResult();
         }
 
-
+        private static async Task<IResult> CreateTeacher(
+           CreateTeacherCommand command,
+           IMediator mediator)
+        {
+            var result = await mediator.Send(command);
+            return result.ToHttpResult();
+        }
 
         private static async Task<IResult> GetCurrentUser(
-    HttpContext context,
-    IMediator mediator)
+            HttpContext context,
+            IMediator mediator)
         {
             var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
@@ -190,8 +192,8 @@ namespace ELearningProject.Features.Auth
         }
 
         private static async Task<IResult> ChangePassword(
-    ChangePasswordCommand command,
-    IMediator mediator)
+            ChangePasswordCommand command,
+            IMediator mediator)
         {
             var result = await mediator.Send(command);
             return Results.Ok(new
@@ -229,11 +231,9 @@ namespace ELearningProject.Features.Auth
             return Results.Ok(response);
         }
 
-
-
         private static async Task<IResult> ForgetPassword(
-    SendOtpCommand command,
-    IMediator mediator)
+            SendOtpCommand command,
+            IMediator mediator)
         {
             var result = await mediator.Send(command);
             return Results.Ok(new
@@ -244,8 +244,8 @@ namespace ELearningProject.Features.Auth
         }
 
         private static async Task<IResult> VerifyOtp(
-    VerifyOtpCommand command,
-    IMediator mediator)
+            VerifyOtpCommand command,
+            IMediator mediator)
         {
             var result = await mediator.Send(command);
             return Results.Ok(new
@@ -256,8 +256,8 @@ namespace ELearningProject.Features.Auth
         }
 
         private static async Task<IResult> ResetPassword(
-    ResetPasswordCommand command,
-    IMediator mediator)
+            ResetPasswordCommand command,
+            IMediator mediator)
         {
             var result = await mediator.Send(command);
             return Results.Ok(new

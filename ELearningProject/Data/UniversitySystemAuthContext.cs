@@ -27,6 +27,7 @@ namespace ELearningProject.Data
         public DbSet<InstructorTrack> InstructorTracks => Set<InstructorTrack>();
         public DbSet<UploadedFile> UploadedFiles => Set<UploadedFile>();
         public DbSet<Article> Articles => Set<Article>();
+        public DbSet<Material> Materials => Set<Material>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,20 +45,7 @@ namespace ELearningProject.Data
             modelBuilder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
             modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
 
-            modelBuilder.Entity<InstructorTrack>()
-                .HasIndex(it => new { it.InstructorId, it.TrackId }).IsUnique();
 
-            modelBuilder.Entity<InstructorTrack>()
-                .HasOne(it => it.Instructor)
-                .WithMany(u => u.InstructorTracks)
-                .HasForeignKey(it => it.InstructorId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<InstructorTrack>()
-                .HasOne(it => it.Track)
-                .WithMany(t => t.InstructorTracks)
-                .HasForeignKey(it => it.TrackId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             // Global Query Filters for Soft Delete
             modelBuilder.Entity<ActivationCode>().HasQueryFilter(e => !e.IsDeleted);
@@ -73,6 +61,7 @@ namespace ELearningProject.Data
             modelBuilder.Entity<InstructorTrack>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<UploadedFile>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<ApplicationUser>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Material>().HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }

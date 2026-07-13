@@ -4,16 +4,19 @@ using ELearningProject.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace ELearningProject.Data.Migrations
+namespace ELearningProject.data.Migrations
 {
     [DbContext(typeof(UniversitySystemAuthContext))]
-    partial class UniversitySystemAuthContextModelSnapshot : ModelSnapshot
+    [Migration("20260713120851_AddInstructorAssignedByAdmin")]
+    partial class AddInstructorAssignedByAdmin
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -455,45 +458,6 @@ namespace ELearningProject.Data.Migrations
                     b.ToTable("Lectures", (string)null);
                 });
 
-            modelBuilder.Entity("ELearningProject.Models.Material", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ExternalLink")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FileUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("LectureId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LectureId");
-
-                    b.ToTable("Materials", (string)null);
-                });
-
             modelBuilder.Entity("ELearningProject.Models.Notification", b =>
                 {
                     b.Property<Guid>("Id")
@@ -877,17 +841,6 @@ namespace ELearningProject.Data.Migrations
                     b.Navigation("Track");
                 });
 
-            modelBuilder.Entity("ELearningProject.Models.Material", b =>
-                {
-                    b.HasOne("ELearningProject.Models.Lecture", "Lecture")
-                        .WithMany("Materials")
-                        .HasForeignKey("LectureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lecture");
-                });
-
             modelBuilder.Entity("ELearningProject.Models.Notification", b =>
                 {
                     b.HasOne("Auth.Models.ApplicationUser", "User")
@@ -1028,8 +981,6 @@ namespace ELearningProject.Data.Migrations
             modelBuilder.Entity("ELearningProject.Models.Lecture", b =>
                 {
                     b.Navigation("Assignments");
-
-                    b.Navigation("Materials");
                 });
 
             modelBuilder.Entity("ELearningProject.Models.Track", b =>

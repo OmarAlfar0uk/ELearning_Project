@@ -69,7 +69,7 @@ namespace ELearningProject.Features.Tracks
             .WithSummary("Get detailed info about a track")
             .Produces<EndpointResponse<TrackDetailsDto>>(200)
             .Produces<EndpointResponse<TrackDetailsDto>>(404)
-            .RequireAuthorization();
+            .RequireAuthorization("TrackOwnership");
 
             // 4. Update Track
             group.MapPut("/tracks/{trackId:guid}", async (

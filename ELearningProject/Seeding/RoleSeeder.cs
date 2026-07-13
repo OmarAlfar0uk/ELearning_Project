@@ -1,4 +1,4 @@
-﻿using Auth.Models;
+using Auth.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace Auth.Data.Seeding
@@ -11,7 +11,8 @@ namespace Auth.Data.Seeding
             {
                 "SuperAdmin",
                 "Admin",
-                "Student"
+                "Student",
+                "Instructor"
             };
 
             foreach (var role in roles)
