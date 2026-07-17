@@ -13,6 +13,7 @@ using ELearningProject.Features.Progress;
 using ELearningProject.Features.Tracks;
 using ELearningProject.Features.Lectures;
 using ELearningProject.Features.Materials;
+using ELearningProject.Features.Exams;
 using ELearningProject.Features.Notifications;
 using ELearningProject.Features.Auth.UpdateUserProfile;
 using ELearningProject.Features.Batche;
@@ -285,6 +286,7 @@ namespace ELearningProject
             app.MapTrackEndpoints();
             app.MapLectureEndpoints();
             app.MapMaterialEndpoints();
+            app.MapExamEndpoints();
             app.MapNotificationEndpoints();
             app.MapFileEndpoints();
             app.MapDashboardEndpoints();

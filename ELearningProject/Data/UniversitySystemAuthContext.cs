@@ -28,6 +28,9 @@ namespace ELearningProject.Data
         public DbSet<UploadedFile> UploadedFiles => Set<UploadedFile>();
         public DbSet<Article> Articles => Set<Article>();
         public DbSet<Material> Materials => Set<Material>();
+        public DbSet<Exam> Exams => Set<Exam>();
+        public DbSet<ExamQuestion> ExamQuestions => Set<ExamQuestion>();
+        public DbSet<ExamQuestionOption> ExamQuestionOptions => Set<ExamQuestionOption>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -62,6 +65,9 @@ namespace ELearningProject.Data
             modelBuilder.Entity<UploadedFile>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<ApplicationUser>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Material>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Exam>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<ExamQuestion>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<ExamQuestionOption>().HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }

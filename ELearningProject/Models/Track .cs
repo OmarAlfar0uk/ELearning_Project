@@ -11,5 +11,6 @@ namespace ELearningProject.Models
 
         public ICollection<Lecture> Lectures { get; set; } = new HashSet<Lecture>();
         public ICollection<InstructorTrack> InstructorTracks { get; set; } = new HashSet<InstructorTrack>();
+        public ICollection<Exam> Exams { get; set; } = new HashSet<Exam>();
     }
 }

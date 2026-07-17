@@ -105,6 +105,18 @@ namespace ELearningProject.Features.Auth
                     }
                 }
             }
+            else if (routeValues.TryGetValue("examId", out var examIdObj) && examIdObj != null)
+            {
+                if (Guid.TryParse(examIdObj.ToString(), out var examId))
+                {
+                    // Query Exam to find its parent TrackId
+                    var exam = await _unitOfWork.GetRepository<Exam>().GetByIdAsync(examId);
+                    if (exam != null)
+                    {
+                        trackId = exam.TrackId;
+                    }
+                }
+            }
 
             // If no valid target track could be resolved from the route parameters, deny access
             if (trackId == null)
