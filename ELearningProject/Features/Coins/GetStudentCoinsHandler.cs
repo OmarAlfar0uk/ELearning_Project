@@ -1,6 +1,7 @@
 using Auth.Models;
 using ELearningProject.Contarcts;
 using ELearningProject.Extensions;
+using ELearningProject.Features.Coins.Services;
 using ELearningProject.Features.Shared;
 using ELearningProject.Models;
 using MediatR;
@@ -12,20 +13,14 @@ namespace ELearningProject.Features.Coins
 {
     /// <summary>
     /// Handler for <see cref="GetStudentCoinsQuery"/>.
-    /// Enforces per-handler authorization:
+    /// Enforces per-handler authorization before returning coin data:
     /// <list type="bullet">
     ///   <item>Student role → may only retrieve their own coins (403 if StudentId ≠ caller).</item>
-    ///   <item>Admin / SuperAdmin role → may retrieve any student's coins.</item>
-    ///   <item>Instructor role → may retrieve any student's coins for now.
-    ///     <para>
-    ///       TODO (Stage 2): Tighten this to "only students enrolled in one of this instructor's
-    ///       tracks". This requires resolving "does instructor X have student Y in any of their
-    ///       tracks?", which is a different shape from the existing <c>TrackOwnership</c> policy
-    ///       (that policy resolves a <c>trackId</c>/<c>lectureId</c>/<c>examId</c> from the route,
-    ///       but this route only carries <c>studentId</c>). Open question for product review before
-    ///       Stage 2 implementation.
-    ///     </para>
-    ///   </item>
+    ///   <item>Admin / SuperAdmin → may retrieve any student's coins; no DB check required.</item>
+    ///   <item>Instructor → may only retrieve coins for students who share at least one
+    ///     batch with one of the instructor's assigned tracks
+    ///     (resolved via <see cref="IStudentAccessService"/>).
+    ///     Returns 403 if the student is not in any of the instructor's tracks' batches.</item>
     /// </list>
     /// </summary>
     public class GetStudentCoinsHandler : IRequestHandler<GetStudentCoinsQuery, EndpointResponse<StudentCoinsDto>>
@@ -33,15 +28,18 @@ namespace ELearningProject.Features.Coins
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IStudentAccessService _studentAccessService;
 
         public GetStudentCoinsHandler(
             IUnitOfWork unitOfWork,
             IHttpContextAccessor httpContextAccessor,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IStudentAccessService studentAccessService)
         {
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
+            _studentAccessService = studentAccessService;
         }
 
         public async Task<EndpointResponse<StudentCoinsDto>> Handle(
@@ -59,12 +57,31 @@ namespace ELearningProject.Features.Coins
             }
 
             // ── 2. Per-handler authorization ──────────────────────────────────────
+
             // Students may only see their own coin history.
             if (callerRole == "Student" && callerId != request.StudentId)
             {
                 return EndpointResponse<StudentCoinsDto>.ErrorResponse(
                     "Students may only view their own coin history.",
                     403);
+            }
+
+            // Instructors: must share a batch with the student via an assigned track.
+            // Admin / SuperAdmin: IStudentAccessService returns true without hitting the DB.
+            if (callerRole != "Student")
+            {
+                var hasAccess = await _studentAccessService.CanAccessStudentCoinsAsync(
+                    callerRole,
+                    callerId,
+                    request.StudentId,
+                    cancellationToken);
+
+                if (!hasAccess)
+                {
+                    return EndpointResponse<StudentCoinsDto>.ErrorResponse(
+                        "Instructors may only view coins for students within their assigned tracks.",
+                        403);
+                }
             }
 
             // ── 3. Verify the target student exists ───────────────────────────────

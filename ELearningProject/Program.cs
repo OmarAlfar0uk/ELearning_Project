@@ -207,6 +207,7 @@ namespace ELearningProject
             builder.Services.AddScoped<ELearningProject.Features.Progress.Services.IProgressService, ELearningProject.Features.Progress.Services.ProgressService>();
             builder.Services.AddScoped<ELearningProject.Features.Notifications.Services.INotificationService, ELearningProject.Features.Notifications.Services.NotificationService>();
             builder.Services.AddScoped<IFileService, FileService>();
+            builder.Services.AddScoped<ELearningProject.Features.Coins.Services.IStudentAccessService, ELearningProject.Features.Coins.Services.StudentAccessService>();
 
             
 
