@@ -22,6 +22,7 @@ using ELearningProject.Features.Submissions;
 using ELearningProject.Features.Files;
 using ELearningProject.Features.Dashboard;
 using ELearningProject.Features.Articles;
+using ELearningProject.Features.Coins;
 using ELearningProject.Repositories;
 using ELearningProject.Seeding;
 using ELearningProject.Services;
@@ -291,6 +292,7 @@ namespace ELearningProject
             app.MapFileEndpoints();
             app.MapDashboardEndpoints();
             app.MapArticleEndpoints();
+            app.MapCoinEndpoints();
 
             app.MapHub<ELearningProject.Features.Notifications.Hubs.NotificationHub>("/hubs/notifications");
 

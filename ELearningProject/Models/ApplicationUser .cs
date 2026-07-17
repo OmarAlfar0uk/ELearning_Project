@@ -1,4 +1,4 @@
-﻿using ELearningProject.Contracts;
+using ELearningProject.Contracts;
 using ELearningProject.Models;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -28,6 +28,15 @@ namespace Auth.Models
         public string FullName => $"{FirstName} {LastName}";
         
         public ICollection<InstructorTrack> InstructorTracks { get; set; } = new HashSet<InstructorTrack>();
+
+        /// <summary>
+        /// Running total of coins credited to this user.
+        /// Always kept consistent with the sum of <see cref="CoinTransactions"/> via atomic writes.
+        /// </summary>
+        public int CoinBalance { get; set; } = 0;
+
+        /// <summary>Navigation collection of all coin transactions for this student.</summary>
+        public ICollection<ELearningProject.Models.CoinTransaction> CoinTransactions { get; set; } = new HashSet<ELearningProject.Models.CoinTransaction>();
     }
 
 }

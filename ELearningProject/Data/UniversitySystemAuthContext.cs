@@ -33,6 +33,7 @@ namespace ELearningProject.Data
         public DbSet<ExamQuestionOption> ExamQuestionOptions => Set<ExamQuestionOption>();
         public DbSet<ExamAttempt> ExamAttempts => Set<ExamAttempt>();
         public DbSet<ExamAnswer> ExamAnswers => Set<ExamAnswer>();
+        public DbSet<ELearningProject.Models.CoinTransaction> CoinTransactions => Set<ELearningProject.Models.CoinTransaction>();
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -72,6 +73,7 @@ namespace ELearningProject.Data
             modelBuilder.Entity<ExamQuestionOption>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<ExamAttempt>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<ExamAnswer>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<ELearningProject.Models.CoinTransaction>().HasQueryFilter(e => !e.IsDeleted);
         }
     }
 }
