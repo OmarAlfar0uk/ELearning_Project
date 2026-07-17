@@ -1,5 +1,6 @@
 using ELearningProject.Features.Shared;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -121,6 +122,96 @@ namespace ELearningProject.Features.Exams
             .Produces<EndpointResponse<string>>(200)
             .Produces<EndpointResponse<string>>(400)
             .Produces<EndpointResponse<string>>(404)
+            .RequireAuthorization("TrackOwnership");
+
+            group.MapPost("/exams/{examId:guid}/attempts", async (
+                Guid examId,
+                IMediator mediator) =>
+            {
+                var response = await mediator.Send(new StartExamCommand(examId));
+
+                return response.IsSuccess
+                    ? Results.Created($"/api/v1/attempts/{response.Data?.Id}", response)
+                    : Results.Json(response, statusCode: response.StatusCode);
+            })
+            .WithName("Start Exam")
+            .WithSummary("Start an exam attempt as a student")
+            .Produces<EndpointResponse<ExamAttemptDto>>(201)
+            .Produces<EndpointResponse<ExamAttemptDto>>(400)
+            .Produces<EndpointResponse<ExamAttemptDto>>(404)
+            .Produces<EndpointResponse<ExamAttemptDto>>(409)
+            .RequireAuthorization(policy => policy.RequireRole("Student"));
+
+            group.MapPost("/attempts/{attemptId:guid}/submit", async (
+                Guid attemptId,
+                [FromBody] SubmitExamCommand command,
+                IMediator mediator) =>
+            {
+                command = command with { AttemptId = attemptId };
+                var response = await mediator.Send(command);
+
+                return response.IsSuccess
+                    ? Results.Ok(response)
+                    : Results.Json(response, statusCode: response.StatusCode);
+            })
+            .WithName("Submit Exam")
+            .WithSummary("Submit answers for an exam attempt")
+            .Produces<EndpointResponse<ExamAttemptDto>>(200)
+            .Produces<EndpointResponse<ExamAttemptDto>>(400)
+            .Produces<EndpointResponse<ExamAttemptDto>>(403)
+            .Produces<EndpointResponse<ExamAttemptDto>>(404)
+            .RequireAuthorization(policy => policy.RequireRole("Student"));
+
+            group.MapGet("/attempts/{attemptId:guid}", async (
+                Guid attemptId,
+                IMediator mediator) =>
+            {
+                var response = await mediator.Send(new GetAttemptResultQuery(attemptId));
+
+                return response.IsSuccess
+                    ? Results.Ok(response)
+                    : Results.Json(response, statusCode: response.StatusCode);
+            })
+            .WithName("Get Attempt Result")
+            .WithSummary("Get the result of an exam attempt")
+            .Produces<EndpointResponse<ExamAttemptResultDto>>(200)
+            .Produces<EndpointResponse<ExamAttemptResultDto>>(403)
+            .Produces<EndpointResponse<ExamAttemptResultDto>>(404)
+            .RequireAuthorization();
+
+            group.MapPost("/answers/{answerId:guid}/grade", async (
+                Guid answerId,
+                [FromBody] GradeAnswerCommand command,
+                IMediator mediator) =>
+            {
+                command = command with { AnswerId = answerId };
+                var response = await mediator.Send(command);
+
+                return response.IsSuccess
+                    ? Results.Ok(response)
+                    : Results.Json(response, statusCode: response.StatusCode);
+            })
+            .WithName("Grade Exam Answer")
+            .WithSummary("Manually grade an essay or fill-in-the-blank answer")
+            .Produces<EndpointResponse<string>>(200)
+            .Produces<EndpointResponse<string>>(400)
+            .Produces<EndpointResponse<string>>(404)
+            .RequireAuthorization("TrackOwnership");
+
+            group.MapGet("/exams/{examId:guid}/attempts", async (
+                Guid examId,
+                IMediator mediator) =>
+            {
+                var response = await mediator.Send(new GetExamAttemptsQuery(examId));
+
+                return response.IsSuccess
+                    ? Results.Ok(response)
+                    : Results.Json(response, statusCode: response.StatusCode);
+            })
+            .WithName("Get Exam Attempts")
+            .WithSummary("Get all student attempts for an exam")
+            .Produces<EndpointResponse<List<ExamAttemptSummaryDto>>>(200)
+            .Produces<EndpointResponse<List<ExamAttemptSummaryDto>>>(404)
             .RequireAuthorization("TrackOwnership");
         }
     }
