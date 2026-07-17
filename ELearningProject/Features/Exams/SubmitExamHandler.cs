@@ -1,10 +1,12 @@
 using ELearningProject.Contarcts;
 using ELearningProject.Extensions;
+using ELearningProject.Features.Coins.Services;
 using ELearningProject.Features.Shared;
 using ELearningProject.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace ELearningProject.Features.Exams
 {
@@ -15,13 +17,16 @@ namespace ELearningProject.Features.Exams
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICoinAwardService _coinAwardService;
 
         public SubmitExamHandler(
             IUnitOfWork unitOfWork,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            ICoinAwardService coinAwardService)
         {
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
+            _coinAwardService = coinAwardService;
         }
 
         public async Task<EndpointResponse<ExamAttemptDto>> Handle(
@@ -193,6 +198,28 @@ namespace ELearningProject.Features.Exams
 
             attemptRepository.Update(attempt);
             await _unitOfWork.SaveChangesAsync();
+
+            // ── Stage 2: award coins for passing an auto-graded exam ───────────────
+            // Only fires when all questions are objective (Status flipped to Graded above).
+            // Manual-grading path (Status = Submitted) is handled by GradeAnswerHandler
+            // once the last answer is scored.
+            // Wrapped in try/catch: a coin-award failure must never roll back the
+            // committed exam result.
+            if (attempt.Status == AttemptStatus.Graded)
+            {
+                try
+                {
+                    await _coinAwardService.AwardExamCoinsIfEligibleAsync(
+                        attempt.Id, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(
+                        ex,
+                        "CoinAward | SubmitExamHandler | AttemptId={AttemptId} | {Message}",
+                        attempt.Id, ex.Message);
+                }
+            }
 
             var dto = new ExamAttemptDto(
                 attempt.Id,

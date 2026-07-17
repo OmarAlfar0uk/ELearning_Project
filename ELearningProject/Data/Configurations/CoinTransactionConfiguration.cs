@@ -7,8 +7,13 @@ namespace ELearningProject.Data.Configurations
 {
     /// <summary>
     /// EF Core fluent configuration for the <see cref="CoinTransaction"/> entity.
-    /// Defines the table name, column constraints, and both foreign-key relationships
-    /// to <see cref="ApplicationUser"/> (as Student and as GrantedByAdmin).
+    /// Defines the table name, column constraints, and all foreign-key relationships:
+    /// <list type="bullet">
+    ///   <item>M:1 → ApplicationUser as Student (required, Restrict)</item>
+    ///   <item>M:1 → ApplicationUser as GrantedByAdmin (optional, Restrict)</item>
+    ///   <item>M:1 → ExamAttempt as RelatedExamAttempt (optional, Restrict) — Stage 2 idempotency guard</item>
+    ///   <item>M:1 → Submission as RelatedSubmission (optional, Restrict) — Stage 2 idempotency guard</item>
+    /// </list>
     /// </summary>
     public class CoinTransactionConfiguration : IEntityTypeConfiguration<CoinTransaction>
     {
@@ -40,6 +45,23 @@ namespace ELearningProject.Data.Configurations
             builder.HasOne(ct => ct.GrantedByAdmin)
                    .WithMany()
                    .HasForeignKey(ct => ct.GrantedByAdminId)
+                   .IsRequired(false)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            // M:1 → ExamAttempt (optional — Stage 2 idempotency guard for ExamPassed)
+            // Restrict: prevents physical deletion of an attempt that has already
+            // generated a coin award, preserving audit integrity.
+            builder.HasOne(ct => ct.RelatedExamAttempt)
+                   .WithMany()
+                   .HasForeignKey(ct => ct.RelatedExamAttemptId)
+                   .IsRequired(false)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            // M:1 → Submission (optional — Stage 2 idempotency guard for AssignmentOnTime)
+            // Restrict: same rationale as above.
+            builder.HasOne(ct => ct.RelatedSubmission)
+                   .WithMany()
+                   .HasForeignKey(ct => ct.RelatedSubmissionId)
                    .IsRequired(false)
                    .OnDelete(DeleteBehavior.Restrict);
         }

@@ -1,8 +1,10 @@
 using ELearningProject.Contarcts;
+using ELearningProject.Features.Coins.Services;
 using ELearningProject.Features.Shared;
 using ELearningProject.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace ELearningProject.Features.Exams
 {
@@ -12,10 +14,14 @@ namespace ELearningProject.Features.Exams
     public class GradeAnswerHandler : IRequestHandler<GradeAnswerCommand, EndpointResponse<string>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICoinAwardService _coinAwardService;
 
-        public GradeAnswerHandler(IUnitOfWork unitOfWork)
+        public GradeAnswerHandler(
+            IUnitOfWork unitOfWork,
+            ICoinAwardService coinAwardService)
         {
             _unitOfWork = unitOfWork;
+            _coinAwardService = coinAwardService;
         }
 
         public async Task<EndpointResponse<string>> Handle(
@@ -81,6 +87,22 @@ namespace ELearningProject.Features.Exams
                     attempt.Status = AttemptStatus.Graded;
                     attemptRepository.Update(attempt);
                     await _unitOfWork.SaveChangesAsync();
+
+                    // ── Stage 2: award coins now that the last answer is manually graded ──
+                    // Wrapped in try/catch: a coin-award failure must never roll back
+                    // the committed grading result.
+                    try
+                    {
+                        await _coinAwardService.AwardExamCoinsIfEligibleAsync(
+                            attempt.Id, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(
+                            ex,
+                            "CoinAward | GradeAnswerHandler | AttemptId={AttemptId} | {Message}",
+                            attempt.Id, ex.Message);
+                    }
                 }
             }
 

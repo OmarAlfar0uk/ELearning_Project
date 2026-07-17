@@ -5,6 +5,7 @@ using ELearningProject.Features.Shared;
 using ELearningProject.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace ELearningProject.Features.Submissions.SubmitAssignment
 {
@@ -14,17 +15,20 @@ namespace ELearningProject.Features.Submissions.SubmitAssignment
         private readonly ELearningProject.Features.Notifications.Services.INotificationService _notificationService;
         private readonly Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> _userManager;
         private readonly ELearningProject.Contracts.IFileService _fileService;
+        private readonly ELearningProject.Features.Coins.Services.ICoinAwardService _coinAwardService;
 
         public SubmitAssignmentHandler(
             IUnitOfWork unitOfWork, 
             ELearningProject.Features.Notifications.Services.INotificationService notificationService,
             Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> userManager,
-            ELearningProject.Contracts.IFileService fileService)
+            ELearningProject.Contracts.IFileService fileService,
+            ELearningProject.Features.Coins.Services.ICoinAwardService coinAwardService)
         {
             _unitOfWork = unitOfWork;
             _notificationService = notificationService;
             _userManager = userManager;
             _fileService = fileService;
+            _coinAwardService = coinAwardService;
         }
 
         public async Task<EndpointResponse<string>> Handle(SubmitAssignmentCommand request, CancellationToken cancellationToken)
@@ -98,6 +102,22 @@ namespace ELearningProject.Features.Submissions.SubmitAssignment
 
             await submissionRepository.CreateAsync(submission);
             await _unitOfWork.SaveChangesAsync();
+
+            // ── Stage 2: award coins for on-time submission ──────────────────────
+            // Wrapped in try/catch: a coin-award failure must never roll back
+            // the committed submission.
+            try
+            {
+                await _coinAwardService.AwardAssignmentCoinsIfEligibleAsync(
+                    submission.Id, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(
+                    ex,
+                    "CoinAward | SubmitAssignmentHandler | SubmissionId={SubmissionId} | {Message}",
+                    submission.Id, ex.Message);
+            }
 
             var admins = await _userManager.GetUsersInRoleAsync("Admin");
             var superAdmins = await _userManager.GetUsersInRoleAsync("SuperAdmin");

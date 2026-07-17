@@ -38,7 +38,7 @@ namespace ELearningProject.Features.Coins
     /// <param name="StudentId">The student's identifier.</param>
     /// <param name="StudentName">The student's full name.</param>
     /// <param name="CoinBalance">The student's current coin balance.</param>
-    public record TopStudentDto(
+    public record CoinTopStudentDto(
         Guid StudentId,
         string StudentName,
         int CoinBalance);
@@ -51,6 +51,6 @@ namespace ELearningProject.Features.Coins
     /// <param name="RecentTransactions">The 20 most recent transactions across all students.</param>
     public record CoinsDistributionDto(
         int TotalDistributed,
-        List<TopStudentDto> TopStudents,
+        List<CoinTopStudentDto> TopStudents,
         List<CoinTransactionDto> RecentTransactions);
 }

@@ -49,7 +49,7 @@ namespace ELearningProject.Features.Coins
                 .GetAll()
                 .OrderByDescending(u => u.CoinBalance)
                 .Take(10)
-                .Select(u => new TopStudentDto(
+                .Select(u => new CoinTopStudentDto(
                     u.Id,
                     u.FirstName + " " + u.LastName,
                     u.CoinBalance))

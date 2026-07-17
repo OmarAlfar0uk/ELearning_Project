@@ -29,7 +29,7 @@ namespace ELearningProject.Features.Coins.Services
         /// <param name="instructorId">The caller's user ID (used only when role is <c>Instructor</c>).</param>
         /// <param name="studentId">The target student whose coin data is being accessed.</param>
         /// <param name="cancellationToken">Propagated cancellation token.</param>
-        Task<bool> CanAccessStudentCoinsAsync(
+        Task<bool> CanAccessStudentAsync(
             string callerRole,
             Guid instructorId,
             Guid studentId,
@@ -49,7 +49,7 @@ namespace ELearningProject.Features.Coins.Services
         }
 
         /// <inheritdoc />
-        public async Task<bool> CanAccessStudentCoinsAsync(
+        public async Task<bool> CanAccessStudentAsync(
             string callerRole,
             Guid instructorId,
             Guid studentId,

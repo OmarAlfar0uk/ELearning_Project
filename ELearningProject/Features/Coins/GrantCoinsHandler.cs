@@ -78,7 +78,7 @@ namespace ELearningProject.Features.Coins
             // Admin and SuperAdmin: IStudentAccessService returns true without a DB hit.
             // Instructor: returns true only if the student shares a batch with one of
             //   the instructor's assigned tracks (InstructorTracks → Track.BatchId → BatchStudents).
-            var hasAccess = await _studentAccessService.CanAccessStudentCoinsAsync(
+            var hasAccess = await _studentAccessService.CanAccessStudentAsync(
                 callerRole,
                 grantedByAdminId,
                 request.StudentId,

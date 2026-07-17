@@ -70,7 +70,7 @@ namespace ELearningProject.Features.Coins
             // Admin / SuperAdmin: IStudentAccessService returns true without hitting the DB.
             if (callerRole != "Student")
             {
-                var hasAccess = await _studentAccessService.CanAccessStudentCoinsAsync(
+                var hasAccess = await _studentAccessService.CanAccessStudentAsync(
                     callerRole,
                     callerId,
                     request.StudentId,

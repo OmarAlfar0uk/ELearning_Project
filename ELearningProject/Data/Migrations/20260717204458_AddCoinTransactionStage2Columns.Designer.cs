@@ -4,6 +4,7 @@ using ELearningProject.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELearningProject.Data.Migrations
 {
     [DbContext(typeof(UniversitySystemAuthContext))]
-    partial class UniversitySystemAuthContextModelSnapshot : ModelSnapshot
+    [Migration("20260717204458_AddCoinTransactionStage2Columns")]
+    partial class AddCoinTransactionStage2Columns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

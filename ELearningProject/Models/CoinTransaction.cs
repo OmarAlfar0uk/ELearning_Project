@@ -4,7 +4,7 @@ namespace ELearningProject.Models
 {
     /// <summary>
     /// Records a single coin credit posted to a student's ledger.
-    /// Each row represents one discrete grant (manual or, in future stages, automatic).
+    /// Each row represents one discrete grant — manual (Stage 1) or automatic (Stage 2+).
     /// </summary>
     public class CoinTransaction : BaseEntity
     {
@@ -15,7 +15,7 @@ namespace ELearningProject.Models
         public ApplicationUser Student { get; set; } = default!;
 
         /// <summary>
-        /// Number of coins credited. Must be positive in Stage 1 (manual grants only).
+        /// Number of coins credited. Always positive.
         /// </summary>
         public int Amount { get; set; }
 
@@ -35,5 +35,30 @@ namespace ELearningProject.Models
         /// Navigation property to the granting admin/instructor's <see cref="ApplicationUser"/> record.
         /// </summary>
         public ApplicationUser? GrantedByAdmin { get; set; }
+
+        // ── Stage 2: idempotency guard columns ───────────────────────────────────
+        // Exactly one of these will be non-null for automatic triggers so the system
+        // can assert "no CoinTransaction already references this attempt/submission"
+        // before creating a duplicate award.
+
+        /// <summary>
+        /// The <see cref="ExamAttempt"/> that triggered this transaction
+        /// (set when <see cref="Source"/> == <see cref="CoinSource.ExamPassed"/>).
+        /// Used as an idempotency guard — at most one transaction per attempt.
+        /// </summary>
+        public Guid? RelatedExamAttemptId { get; set; }
+
+        /// <summary>Navigation property to the triggering <see cref="ExamAttempt"/>.</summary>
+        public ExamAttempt? RelatedExamAttempt { get; set; }
+
+        /// <summary>
+        /// The <see cref="Submission"/> that triggered this transaction
+        /// (set when <see cref="Source"/> == <see cref="CoinSource.AssignmentOnTime"/>).
+        /// Used as an idempotency guard — at most one transaction per submission.
+        /// </summary>
+        public Guid? RelatedSubmissionId { get; set; }
+
+        /// <summary>Navigation property to the triggering <see cref="Submission"/>.</summary>
+        public Submission? RelatedSubmission { get; set; }
     }
 }

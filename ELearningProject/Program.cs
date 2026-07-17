@@ -23,6 +23,7 @@ using ELearningProject.Features.Files;
 using ELearningProject.Features.Dashboard;
 using ELearningProject.Features.Articles;
 using ELearningProject.Features.Coins;
+using ELearningProject.Features.StudentEvaluation;
 using ELearningProject.Repositories;
 using ELearningProject.Seeding;
 using ELearningProject.Services;
@@ -208,6 +209,7 @@ namespace ELearningProject
             builder.Services.AddScoped<ELearningProject.Features.Notifications.Services.INotificationService, ELearningProject.Features.Notifications.Services.NotificationService>();
             builder.Services.AddScoped<IFileService, FileService>();
             builder.Services.AddScoped<ELearningProject.Features.Coins.Services.IStudentAccessService, ELearningProject.Features.Coins.Services.StudentAccessService>();
+            builder.Services.AddScoped<ELearningProject.Features.Coins.Services.ICoinAwardService, ELearningProject.Features.Coins.Services.CoinAwardService>();
 
             
 
@@ -294,6 +296,7 @@ namespace ELearningProject
             app.MapDashboardEndpoints();
             app.MapArticleEndpoints();
             app.MapCoinEndpoints();
+            app.MapStudentEvaluationEndpoints();
 
             app.MapHub<ELearningProject.Features.Notifications.Hubs.NotificationHub>("/hubs/notifications");
 
