@@ -17,39 +17,37 @@ namespace ELearningProject.Features.Files
                            .RequireAuthorization();
 
             group.MapPost("/upload", async (
-                HttpRequest request,
-                ELearningProject.Contracts.IFileService fileService,
-                ClaimsPrincipal userPrincipal,
-                ILoggerFactory loggerFactory) => 
-            {
-                var file = request.Form.Files.GetFile("file");
-                var folder = request.Form["folder"].FirstOrDefault();
-
-                var logger = loggerFactory.CreateLogger("FileUpload");
-                try
-                {
-                    if (file == null || file.Length == 0)
+            IFormFile file, // تم استبدال HttpRequest بـ IFormFile
+            [FromForm] string? folder, // قراءة الفولدر مباشرة كمعامل
+            ELearningProject.Contracts.IFileService fileService,
+            ClaimsPrincipal userPrincipal,
+            ILoggerFactory loggerFactory) =>
                     {
-                         return (IResult)Results.BadRequest(EndpointResponse<string>.ErrorResponse("No file was provided.", 400));
-                    }
-
-                    var userId = userPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
-                    Guid? userGuid = string.IsNullOrEmpty(userId) ? null : Guid.Parse(userId);
-
-                    var url = await fileService.SaveFileAsync(file, folder ?? "General", userGuid);
-                    return (IResult)Results.Ok(EndpointResponse<string>.SuccessResponse(url, "File uploaded successfully."));
-                }
-                catch (ArgumentException ex)
-                {
-                     logger.LogWarning(ex, "Invalid file upload attempt: {Message}", ex.Message);
-                     return (IResult)Results.BadRequest(EndpointResponse<string>.ErrorResponse(ex.Message, 400));
-                }
-                catch (Exception ex)
-                {
-                     logger.LogError(ex, "Unexpected error during file upload");
-                     return (IResult)Results.StatusCode(500);
-                }
-            })
+                        var logger = loggerFactory.CreateLogger("FileUpload");
+                        try
+                        {
+                            if (file == null || file.Length == 0)
+                            {
+                                return (IResult)Results.BadRequest(EndpointResponse<string>.ErrorResponse("No file was provided.", 400));
+                            }
+            
+                            var userId = userPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+                            Guid? userGuid = string.IsNullOrEmpty(userId) ? null : Guid.Parse(userId);
+            
+                            var url = await fileService.SaveFileAsync(file, folder ?? "General", userGuid);
+                            return (IResult)Results.Ok(EndpointResponse<string>.SuccessResponse(url, "File uploaded successfully."));
+                        }
+                        catch (ArgumentException ex)
+                        {
+                            logger.LogWarning(ex, "Invalid file upload attempt: {Message}", ex.Message);
+                            return (IResult)Results.BadRequest(EndpointResponse<string>.ErrorResponse(ex.Message, 400));
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, "Unexpected error during file upload");
+                            return (IResult)Results.StatusCode(500);
+                        }
+                    })
             .DisableAntiforgery()
             .WithName("Upload File")
             .WithSummary("Upload a single file with DB tracking")
@@ -57,13 +55,11 @@ namespace ELearningProject.Features.Files
             .Produces<EndpointResponse<string>>(400);
 
             group.MapPost("/bulk", async (
-                HttpRequest request,
+                IFormFileCollection files, // تم استبدال HttpRequest بـ IFormFileCollection
+                [FromForm] string? folder, // قراءة الفولدر مباشرة كمعامل
                 ELearningProject.Contracts.IFileService fileService,
                 ClaimsPrincipal userPrincipal) =>
             {
-                var files = request.Form.Files;
-                var folder = request.Form["folder"].FirstOrDefault();
-
                 if (files == null || files.Count == 0)
                     return Results.BadRequest(EndpointResponse<string>.ErrorResponse("No files provided.", 400));
 
