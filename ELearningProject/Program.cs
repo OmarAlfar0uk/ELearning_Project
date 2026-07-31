@@ -42,7 +42,7 @@ namespace ELearningProject
     {
         public static async Task Main(string[] args)
         {
-
+    
             #region Serilog
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
