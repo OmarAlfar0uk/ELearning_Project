@@ -1,0 +1,8 @@
+<!-- # Global fallback — every file needs your review
+* @aya-anwar22
+
+# Infrastructure changes are critical — enforce your review
+.github/workflows/ @aya-anwar22
+docker-compose*.yml @aya-anwar22
+nginx/ @aya-anwar22
+backups/ @aya-anwar22 -->
